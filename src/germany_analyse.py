@@ -65,12 +65,13 @@ matplotlib.rc('axes', labelsize=15)
 
 fig = plt.figure(figsize=[20, 20])
 ax = fig.add_subplot(2, 1, 1)
-# plt.xticks(rotation=80)
+plt.xticks(rotation=80)
 # plt.xlim(date_minBY, date_minBY)
 
 ax.set_xlabel('Date')
 ax.set_ylabel('Accumulated cases confirmed in Bayern')
 ax.set_title('Accumulated cases confirmed in Bayern')
+
 print(bayern['RegistrationDate'].iloc[-3])
 
 # the data of the RKI is not complete within the last four days, cases will be added in the next days

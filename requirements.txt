@@ -2,6 +2,9 @@ numpy
 pandas
 wheel
 scipy
-joblib
 matplotlib
 scikit-learn
+plotly
+IPython
+seaborn
+
