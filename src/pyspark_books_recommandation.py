@@ -5,47 +5,29 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
 books = pd.read_csv('books/books.csv', error_bad_lines=False)
-books.head()
-books.shape
+books.drop_duplicates(subset='original_title', keep=False, inplace=True)
 
 ratings = pd.read_csv('books/ratings.csv')
-
-ratings.head()
-
-tags = pd.read_csv('books/book_tags.csv')
-tags.tail()
-
-btags = pd.read_csv('books/tags.csv')
-btags.tail()
-
 ratings = ratings.sort_values("user_id")
-ratings.shape
-
 ratings.drop_duplicates(subset=["user_id", "book_id"],
                         keep=False, inplace=True)
-ratings.shape
 
-print(books.shape)
-books.drop_duplicates(subset='original_title', keep=False, inplace=True)
-print(books.shape)
-
-print(btags.shape)
-btags.drop_duplicates(subset='tag_id', keep=False, inplace=True)
-print(btags.shape)
-
-print(tags.shape)
+tags = pd.read_csv('books/book_tags.csv')
 tags.drop_duplicates(subset=['tag_id', 'goodreads_book_id'], keep=False, inplace=True)
-print(tags.shape)
+
+btags = pd.read_csv('books/tags.csv')
+btags.drop_duplicates(subset='tag_id', keep=False, inplace=True)
+
 
 joint_tags = pd.merge(tags, btags, left_on='tag_id', right_on='tag_id', how='inner')
 
 top_rated = books.sort_values('average_rating', ascending=False)
 top10 = top_rated.head(10)
-f = ['title', 'small_image_url']
-displ = (top10[f])
+f = ['title', 'authors', 'original_publication_year', 'ratings_count', 'language_code']
+rows = ['title', 'ratings_count', 'authors']
+
+displ = (top10[rows])
 displ.set_index('title', inplace=True)
-
-
 
 plt.figure(figsize=(16, 8))
 sns.distplot(a=books['average_rating'], kde=True, color='r')
@@ -77,38 +59,8 @@ for i in range(len(genres)):
 new_tags = p[p.index.isin(genres)]
 
 
-
-fig = go.Figure(go.Bar(
-    x=new_tags['count'],
-    y=new_tags.index,
-    orientation='h'))
-
-fig.show()
-
-fig = px.line(books, y="books_count", x="average_rating", title='Book Count VS Average Rating')
-fig.show()
-
-dropna = books.dropna()
-fig = px.treemap(dropna, path=['original_publication_year', 'language_code', "average_rating"],
-                 color='average_rating')
-fig.show()
-books['length-title'] = books['original_title'].str.len()
-
-plt.figure(figsize=(16, 8))
-sns.regplot(x=books['length-title'], y=books['average_rating'])
-
-
-
-text = new_tags.index.values
-
-wordcloud = WordCloud().generate(str(text))
-plt.figure(figsize=(8, 8), facecolor=None)
-plt.imshow(wordcloud)
-plt.axis("off")
-plt.show()
-
 books.columns
-to_read = pd.read_csv("/kaggle/input/goodbooks-10k/to_read.csv")
+to_read = pd.read_csv("books/to_read.csv")
 to_r = books.merge(to_read, left_on='book_id', right_on='book_id', how='inner')
 
 to_r = to_r.groupby('original_title').count()
@@ -191,13 +143,12 @@ def get_recommendations_new(title, cosine_sim=cosine_sim2):
 
 
 l = get_recommendations_new('The Hobbit', cosine_sim2)
-fig = go.Figure(data=[go.Table(header=dict(values=l, fill_color='orange'))
-                      ])
+fig = go.Figure(data=[go.Table(header=dict(values=l, fill_color='orange'))])
 fig.show()
 
 l = get_recommendations_new('Harry Potter and The Chamber of Secrets', cosine_sim2)
 fig = go.Figure(data=[go.Table(header=dict(values=l, fill_color='orange'))
-                      ])
+])
 fig.show()
 
 usecols = ['book_id', 'original_title']
