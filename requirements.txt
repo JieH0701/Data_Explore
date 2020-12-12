@@ -7,4 +7,5 @@ scikit-learn
 plotly
 IPython
 seaborn
-
+fuzzywuzzy
+python-Levenshtein
